@@ -1,8 +1,15 @@
 const express = require("express");
-const  createDestination = require("../controllers/destinationController");
+const { createDestination, getAllDestinations, getDestinationById } = require("../controllers/destinationController");
 
 const router = express.Router();
 
-// POST => create a destination
+// POST => Create a new destination
 router.post("/", createDestination);
+
+// GET => Get all destinations
+router.get("/", getAllDestinations);
+
+// GET => Get a single destination by ID
+router.get("/:id", getDestinationById);
+
 module.exports = router;
