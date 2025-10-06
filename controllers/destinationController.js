@@ -32,20 +32,48 @@ const createDestination = async (req, res) => {
 // @desc   Get all destinations
 // @route  GET /api/destinations
 // @access Public
+// const getAllDestinations = async (req, res) => {
+//   try {
+//     const destinations = await Destination.find(); // fetch all documents
+//     res.status(200).json({
+//       success: true,
+//       count: destinations.length,
+//       data: destinations,
+//     });
+//   } catch (error) {
+//     console.error("Error fetching destinations:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server Error while fetching destinations",
+//     });
+//   }
+// };
 const getAllDestinations = async (req, res) => {
   try {
-    const destinations = await Destination.find(); // fetch all documents
+    const { continent, priceRange, wifiSpeed, page = 1, limit = 8 } = req.query;
+
+    const query = {};
+
+    if (continent) query.continent = continent;
+    if (priceRange) query.priceRange = priceRange;
+    if (wifiSpeed) query.wifiSpeed = { $gte: Number(wifiSpeed) };
+
+    const skip = (page - 1) * limit;
+    const total = await Destination.countDocuments(query);
+
+    const destinations = await Destination.find(query)
+      .skip(skip)
+      .limit(Number(limit));
+
     res.status(200).json({
       success: true,
-      count: destinations.length,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: Number(page),
       data: destinations,
     });
   } catch (error) {
-    console.error("Error fetching destinations:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server Error while fetching destinations",
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
