@@ -50,13 +50,24 @@ const createDestination = async (req, res) => {
 // };
 const getAllDestinations = async (req, res) => {
   try {
-    const { continent, priceRange, wifiSpeed, page = 1, limit = 8 } = req.query;
+    const { continent, priceRange, wifiSpeed, search, page = 1, limit = 8 } = req.query; // 🔹 add search
 
     const query = {};
 
     if (continent) query.continent = continent;
     if (priceRange) query.priceRange = priceRange;
     if (wifiSpeed) query.wifiSpeed = { $gte: Number(wifiSpeed) };
+
+    //  Add search filter
+    if (search) {
+      const regex = new RegExp(search, "i"); // case-insensitive
+      query.$or = [
+        { city: regex },
+        { country: regex },
+        { continent: regex },
+        { title: regex },
+      ];
+    }
 
     const skip = (page - 1) * limit;
     const total = await Destination.countDocuments(query);
@@ -76,6 +87,7 @@ const getAllDestinations = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // @desc   Get a single destination by ID
 // @route  GET /api/destinations/:id

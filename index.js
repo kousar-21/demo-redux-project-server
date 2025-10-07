@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 5000;
 // Import routes
 const userRoutes = require("./routes/userRoutes");
 const destinationRoutes = require("./routes/destinationRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/destinations", destinationRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // Root route
 app.get("/", (req, res) => {
